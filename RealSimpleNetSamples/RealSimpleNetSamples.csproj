@@ -4,15 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C01C9310-301A-4C74-8D4F-5ED76919FD67}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{4B2F7931-5D2C-416D-8EAC-8CC179482397}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RealSimpleNet</RootNamespace>
-    <AssemblyName>RealSimpleNet</AssemblyName>
+    <RootNamespace>RealSimpleNetSamples</RootNamespace>
+    <AssemblyName>RealSimpleNetSamples</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,12 +34,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions">
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,24 +41,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Helpers\Crypt.cs" />
-    <Compile Include="Helpers\Databases\OleDb.cs" />
-    <Compile Include="Helpers\Databases\SqlServer.cs" />
-    <Compile Include="Helpers\Date.cs" />
-    <Compile Include="Helpers\Exporting.cs" />
-    <Compile Include="Helpers\FTP.cs" />
-    <Compile Include="Helpers\Http.cs" />
-    <Compile Include="Helpers\HttpResponse.cs" />
-    <Compile Include="Helpers\Mail.cs" />
-    <Compile Include="Helpers\Print.cs" />
-    <Compile Include="Helpers\RestClient.cs" />
-    <Compile Include="Helpers\Strings.cs" />
-    <Compile Include="Helpers\Validations.cs" />
-    <Compile Include="MVP\Model.cs" />
-    <Compile Include="MVP\View.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RealSimpleNet\RealSimpleNet.csproj">
+      <Project>{c01c9310-301a-4c74-8d4f-5ed76919fd67}</Project>
+      <Name>RealSimpleNet</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

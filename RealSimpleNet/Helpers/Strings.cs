@@ -38,7 +38,7 @@ namespace RealSimpleNet.Helpers
         {
             string blankspaces = "";
             int i;
-            for (i = 0; i <= spaces; i++)
+            for (i = 0; i < spaces; i++)
             {
                 blankspaces += " ";
             }
