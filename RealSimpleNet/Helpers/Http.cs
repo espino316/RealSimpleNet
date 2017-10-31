@@ -82,7 +82,7 @@ namespace RealSimpleNet.Helpers
 
         public HttpResponse Post(
             string url,
-            object data,
+            object data = null,
             ContentTypes contentType = ContentTypes.UrlEncoded,
             Dictionary<string,string> headers = null)
         {
@@ -91,7 +91,7 @@ namespace RealSimpleNet.Helpers
 
         public HttpResponse Put(
             string url,
-            object data,
+            object data = null,
             ContentTypes contentType = ContentTypes.UrlEncoded,
             Dictionary<string, string> headers = null)
         {
@@ -100,7 +100,7 @@ namespace RealSimpleNet.Helpers
 
         public HttpResponse Delete(
             string url,
-            object data,
+            object data = null,
             ContentTypes contentType = ContentTypes.UrlEncoded,
             Dictionary<string, string> headers = null)
         {
@@ -171,13 +171,22 @@ namespace RealSimpleNet.Helpers
                     {
                         url += "?" + requestData;
                     }
-                    request = WebRequest.Create(url);
+
+                    request = WebRequest.Create(url);                    
                     request.Method = method.ToString();
+                    foreach (string key in headers.Keys)
+                    {
+                        request.Headers.Add(key, headers[key]);
+                    }
                 }
                 else
                 {
                     request = WebRequest.Create(url);
                     request.Method = method.ToString();
+                    foreach (string key in headers.Keys)
+                    {
+                        request.Headers.Add(key, headers[key]);
+                    }
 
                     byte[] byteArray = Encoding.UTF8.GetBytes(requestData);
                     if (contentType == ContentTypes.Json)
@@ -190,17 +199,11 @@ namespace RealSimpleNet.Helpers
                     }
 
                     request.ContentLength = byteArray.Length;
-
                     dataStream = request.GetRequestStream();
                     dataStream.Write(byteArray, 0, byteArray.Length);
                     dataStream.Close();
                 }
-
-                foreach (string key in headers.Keys)
-                {
-                    request.Headers.Add(key, headers[key]);
-                }
-
+                
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                 HttpResponse httpResponse = new HttpResponse();
                 httpResponse.StatusCode = response.StatusCode;

@@ -10,7 +10,7 @@ namespace RealSimpleNetSamples
     {
         static void Main(string[] args)
         {
-            Rest();
+            TestBillingApi();
         }
 
         private static void Test()
@@ -76,6 +76,52 @@ namespace RealSimpleNetSamples
         {
             GetPedidos();
         }
+
+        class TicketInfo
+        {
+            public string ticketId;
+            public string customerTaxId;
+            public string customerEmail;
+            public string pdfUrl;
+            public string xmlUrl;
+        }
+
+        /// <summary>
+        /// Do a Rest Post
+        /// </summary>
+        static void TestBillingApi()
+        {
+            string endPoint = "http://localhost/eboletos/billingapi/bill";
+            string token = "8495cac4fa9156d509ec300c63b763966792f004";
+            string key = "9e92f522f46124d19e36e3ad049cf78022faaca5";
+
+            Http http = new Http();
+            HttpResponse response;
+
+            http.AddParameter("ticketId", "123456789012345");
+            http.AddParameter("customerTaxId", "XEXX010101000");
+            http.AddParameter("customerEmail", "lespino@prosyss.com");
+
+            http.AddHeader("token", token);
+            http.AddHeader("key", key);
+            
+            response = http.Post(
+                endPoint
+            );
+
+            Dictionary<string,object> info = response.Deserialize<Dictionary<string,object>>();
+
+            if (info.ContainsKey("error"))
+            {
+                Console.WriteLine(String.Format("{0}", info["description"]));
+                Console.Read();
+                return;
+            }
+
+            Console.WriteLine("TicketInfo: " + info["pdfUrl"]);
+            Console.Read();
+               
+        } // end Post
 
         static void Post()
         {
