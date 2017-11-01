@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using static RealSimpleNet.Helpers.Validations;
+using RealSimpleNet.Helpers;
 
 namespace RealSimpleNet.MVP
 {
@@ -255,23 +252,23 @@ namespace RealSimpleNet.MVP
         /// </summary>
         /// <param name="ctrl">El control a validar</param>
         /// <param name="args">Los argumentos de validacion</param>
-        public static void ValidateControl(Control ctrl, params ValidateRule[] args)
+        public static void ValidateControl(Control ctrl, params Validations.ValidateRule[] args)
         {
             if (ctrl.GetType() == typeof(TextBox))
             {
                 TextBox txt = (TextBox)ctrl;
 
-                foreach (ValidateRule rule in args)
+                foreach (Validations.ValidateRule rule in args)
                 {
                     switch (rule)
                     {
-                        case ValidateRule.Numeric:
-                            if (!IsNumeric(txt.Text))
+                        case Validations.ValidateRule.Numeric:
+                            if (!Validations.IsNumeric(txt.Text))
                             {
                                 throw new Exception("El valor debe ser numérico!");
                             }
                             break;
-                        case ValidateRule.Required:
+                        case Validations.ValidateRule.Required:
                             if (txt.Text == "")
                             {
                                 throw new Exception(String.Format("Debe capturar un valor para el control {0}", txt.Name));
@@ -284,11 +281,11 @@ namespace RealSimpleNet.MVP
             {
                 ComboBox cbo = (ComboBox)ctrl;
 
-                foreach (ValidateRule rule in args)
+                foreach (Validations.ValidateRule rule in args)
                 {
                     switch (rule)
                     {
-                        case ValidateRule.Required:
+                        case Validations.ValidateRule.Required:
                             if (cbo.SelectedItem == null)
                             {
                                 throw new Exception(String.Format("Debe capturar un valor para el control {0}", cbo.Name));
@@ -306,11 +303,11 @@ namespace RealSimpleNet.MVP
             {
                 CheckBox check = (CheckBox)ctrl;
 
-                foreach (ValidateRule rule in args)
+                foreach (Validations.ValidateRule rule in args)
                 {
                     switch (rule)
                     {
-                        case ValidateRule.Required:
+                        case Validations.ValidateRule.Required:
                             if (check.CheckState == CheckState.Indeterminate)
                             {
                                 throw new Exception(String.Format("Debe capturar un valor para el control {0}", check.Name));
@@ -323,11 +320,11 @@ namespace RealSimpleNet.MVP
             {
                 DateTimePicker dtpick = (DateTimePicker)ctrl;
 
-                foreach (ValidateRule rule in args)
+                foreach (Validations.ValidateRule rule in args)
                 {
                     switch (rule)
                     {
-                        case ValidateRule.Required:
+                        case Validations.ValidateRule.Required:
                             if (!dtpick.Checked)
                             {
                                 throw new Exception(String.Format("Debe capturar un valor para el control {0}", dtpick.Name));
