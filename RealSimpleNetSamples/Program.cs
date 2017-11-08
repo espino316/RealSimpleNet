@@ -115,7 +115,7 @@ namespace RealSimpleNetSamples
             Http http = new Http();
             HttpResponse response;
 
-            http.AddParameter("ticketId", "123456789020008");
+            http.AddParameter("ticketId", "123456789020009");
             http.AddParameter("customerTaxId", "XEXX010101000");
             http.AddParameter("customerEmail", "lespino@prosyss.com");
             http.AddParameter("airportId", "AICM");
@@ -150,7 +150,8 @@ namespace RealSimpleNetSamples
             string pdfFileName = info["billId"].ToString() + ".pdf";
             Console.WriteLine("pdf: " + pdfFileName);
             http.Download(pdfUrl, pdfFileName);
-            System.Diagnostics.Process.Start(pdfFileName);
+            //System.Diagnostics.Process.Start(pdfFileName);
+            RealSimpleNet.Helpers.PrintHelper.PrintFile(pdfFileName);
             Console.Read();
                
         } // end Post

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Reflection;
@@ -12,6 +13,17 @@ namespace RealSimpleNet.Helpers
 {
     public class PrintHelper
     {
+        public static void PrintFile(string filePath)
+        {
+            Process p = new Process();
+            p.StartInfo = new ProcessStartInfo()
+            {
+                CreateNoWindow = true,
+                Verb = "print",
+                FileName = filePath //put the correct path here
+            };
+            p.Start();
+        }
         class PrintItems
         {
             public enum ItemTypes
