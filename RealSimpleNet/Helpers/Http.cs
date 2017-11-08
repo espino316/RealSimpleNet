@@ -114,6 +114,26 @@ namespace RealSimpleNet.Helpers
             return startTime.Add(time).ToString("yyyy-MM-dd HH:mm:ss");
         }
 
+        public void Download(string url, string filePath, Dictionary<string, string> headers = null)
+        {
+            WebClient webClient = new WebClient();
+
+            if (headers == null)
+            {
+                headers = this.headers;
+            }
+
+            foreach (string key in this.headers.Keys)
+            {
+                webClient.Headers.Add(key, headers[key]);
+            }
+
+            webClient.DownloadFile(
+                url,
+                filePath
+            );
+        } // end function Download
+
         public HttpResponse Request(                       
             string url,
             object data = null,
@@ -225,6 +245,9 @@ namespace RealSimpleNet.Helpers
                 reader.Close();
                 dataStream.Close();
                 response.Close();
+
+                this.ClearHeaders();
+                this.ClearParameters();
                 return httpResponse;
             }
             catch (WebException webEx)

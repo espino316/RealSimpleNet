@@ -13,6 +13,22 @@ namespace RealSimpleNetSamples
             TestBillingApi();
         }
 
+        static void testDownload()
+        {
+            //Http http = new Http();
+            //HttpResponse response = 
+            //http.Get(
+            //"http://dev.eboletos.com.mx/admin/downloadbill/pdf/20171108114751STY090223LX3XEXX010101000"
+            //);
+            //System.IO.File.WriteAllText("20171108114751STY090223LX3XEXX010101000.pdf", response.Data);
+
+            Http http = new Http();
+            http.Download(
+                "http://dev.eboletos.com.mx/admin/downloadbill/pdf/20171108114751STY090223LX3XEXX010101000", 
+                "20171108114751STY090223LX3XEXX010101000.pdf"
+            );
+        }
+
         private static void Test()
         {
             Http http = new Http();
@@ -92,15 +108,24 @@ namespace RealSimpleNetSamples
         static void TestBillingApi()
         {
             string endPoint = "http://localhost/eboletos/billingapi/bill";
+            endPoint = "http://dev.eboletos.com.mx/billingapi/bill";
             string token = "8495cac4fa9156d509ec300c63b763966792f004";
             string key = "9e92f522f46124d19e36e3ad049cf78022faaca5";
 
             Http http = new Http();
             HttpResponse response;
 
-            http.AddParameter("ticketId", "123456789012345");
+            http.AddParameter("ticketId", "123456789020008");
             http.AddParameter("customerTaxId", "XEXX010101000");
             http.AddParameter("customerEmail", "lespino@prosyss.com");
+            http.AddParameter("airportId", "AICM");
+            http.AddParameter("companyId", "44");
+            http.AddParameter("companyBusinessId", "YELLOWCAB");
+            http.AddParameter("zoneId", "1");
+            http.AddParameter("serviceTypeId", "1");
+            http.AddParameter("payFormId", "04");
+            http.AddParameter("fare", "5.00");
+            http.AddParameter("taxRate", "0.000000");
 
             http.AddHeader("token", token);
             http.AddHeader("key", key);
@@ -119,6 +144,13 @@ namespace RealSimpleNetSamples
             }
 
             Console.WriteLine("TicketInfo: " + info["pdfUrl"]);
+
+            string pdfUrl = info["pdfUrl"].ToString();            
+            Console.WriteLine();
+            string pdfFileName = info["billId"].ToString() + ".pdf";
+            Console.WriteLine("pdf: " + pdfFileName);
+            http.Download(pdfUrl, pdfFileName);
+            System.Diagnostics.Process.Start(pdfFileName);
             Console.Read();
                
         } // end Post

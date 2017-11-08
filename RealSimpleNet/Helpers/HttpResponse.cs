@@ -19,8 +19,15 @@ namespace RealSimpleNet.Helpers
 
         public T Deserialize<T>()
         {
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
-            return serializer.Deserialize<T>(this.Data);
+            try
+            {
+                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                return serializer.Deserialize<T>(this.Data);
+            }
+            catch (System.Exception ex)
+            {
+                throw new System.Exception("Cannot serialize data", ex);                
+            }
         }
     }
 }
