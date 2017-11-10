@@ -13,6 +13,16 @@ namespace RealSimpleNetSamples
             TestBillingApi();
         }
 
+        static void onDownload(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        {
+            Console.WriteLine("Completed");            
+        }
+
+        static void onProgress(object sender, System.Net.DownloadProgressChangedEventArgs e)
+        {
+            Console.WriteLine(e.ProgressPercentage);
+        }
+
         static void testDownload()
         {
             //Http http = new Http();
@@ -23,10 +33,14 @@ namespace RealSimpleNetSamples
             //System.IO.File.WriteAllText("20171108114751STY090223LX3XEXX010101000.pdf", response.Data);
 
             Http http = new Http();
-            http.Download(
+            http.DownloadAsync(
                 "http://dev.eboletos.com.mx/admin/downloadbill/pdf/20171108114751STY090223LX3XEXX010101000", 
-                "20171108114751STY090223LX3XEXX010101000.pdf"
+                "20171108114751STY090223LX3XEXX010101000.pdf",
+                onDownload,
+                onProgress
             );
+
+            Console.Read();
         }
 
         private static void Test()
@@ -108,14 +122,14 @@ namespace RealSimpleNetSamples
         static void TestBillingApi()
         {
             string endPoint = "http://localhost/eboletos/billingapi/bill";
-            endPoint = "http://dev.eboletos.com.mx/billingapi/bill";
+            //endPoint = "http://dev.eboletos.com.mx/billingapi/bill";
             string token = "8495cac4fa9156d509ec300c63b763966792f004";
             string key = "9e92f522f46124d19e36e3ad049cf78022faaca5";
 
             Http http = new Http();
             HttpResponse response;
 
-            http.AddParameter("ticketId", "123456789020009");
+            http.AddParameter("ticketId", "123456789020014");
             http.AddParameter("customerTaxId", "XEXX010101000");
             http.AddParameter("customerEmail", "lespino@prosyss.com");
             http.AddParameter("airportId", "AICM");
@@ -126,6 +140,8 @@ namespace RealSimpleNetSamples
             http.AddParameter("payFormId", "04");
             http.AddParameter("fare", "5.00");
             http.AddParameter("taxRate", "0.000000");
+            http.AddParameter("dateTime", "2017-11-10 12:59:30");
+            http.AddParameter("payFormName", "VISA");
 
             http.AddHeader("token", token);
             http.AddHeader("key", key);
@@ -150,8 +166,7 @@ namespace RealSimpleNetSamples
             string pdfFileName = info["billId"].ToString() + ".pdf";
             Console.WriteLine("pdf: " + pdfFileName);
             http.Download(pdfUrl, pdfFileName);
-            //System.Diagnostics.Process.Start(pdfFileName);
-            RealSimpleNet.Helpers.PrintHelper.PrintFile(pdfFileName);
+            PrintHelper.RawPrintFile(pdfFileName);
             Console.Read();
                
         } // end Post

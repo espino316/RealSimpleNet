@@ -57,6 +57,7 @@
     <Compile Include="Helpers\HttpResponse.cs" />
     <Compile Include="Helpers\Mail.cs" />
     <Compile Include="Helpers\Print.cs" />
+    <Compile Include="Helpers\RawPrint.cs" />
     <Compile Include="Helpers\RestClient.cs" />
     <Compile Include="Helpers\Strings.cs" />
     <Compile Include="Helpers\Validations.cs" />

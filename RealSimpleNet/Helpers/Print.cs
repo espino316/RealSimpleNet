@@ -13,6 +13,10 @@ namespace RealSimpleNet.Helpers
 {
     public class PrintHelper
     {
+        public static void RawPrintFile(string filePath)
+        {
+            RawPrinterHelper.SendFileToPrinter(filePath);
+        }
         public static void PrintFile(string filePath)
         {
             Process p = new Process();

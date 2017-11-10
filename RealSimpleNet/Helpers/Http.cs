@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -113,6 +114,21 @@ namespace RealSimpleNet.Helpers
             TimeSpan time = TimeSpan.FromMilliseconds(ms);
             return startTime.Add(time).ToString("yyyy-MM-dd HH:mm:ss");
         }
+
+        private WebClient webClient;
+        
+        public void DownloadAsync(
+            string url, 
+            string filePath,
+            AsyncCompletedEventHandler onDownloadComplete,
+            DownloadProgressChangedEventHandler onDowloadProgressChanged,
+            Dictionary<string, string> headers = null )
+        {
+            webClient = new WebClient();
+            webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(onDownloadComplete);
+            webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(onDowloadProgressChanged);
+            webClient.DownloadFileAsync(new Uri(url), filePath);
+        } // end DownloadAsync
 
         public void Download(string url, string filePath, Dictionary<string, string> headers = null)
         {
