@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Windows.Forms;
 using RealSimpleNet.Helpers;
 
 namespace RealSimpleNetSamples
 {
+    
     class Program
     {
         static void Main(string[] args)
         {
-            TestBillingApi();
+            testDownload();
         }
 
         static void onDownload(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
@@ -116,13 +116,14 @@ namespace RealSimpleNetSamples
             public string xmlUrl;
         }
 
+
         /// <summary>
         /// Do a Rest Post
         /// </summary>
         static void TestBillingApi()
         {
             string endPoint = "http://localhost/eboletos/billingapi/bill";
-            //endPoint = "http://dev.eboletos.com.mx/billingapi/bill";
+            endPoint = "http://dev.eboletos.com.mx/billingapi/bill";
             string token = "8495cac4fa9156d509ec300c63b763966792f004";
             string key = "9e92f522f46124d19e36e3ad049cf78022faaca5";
 
