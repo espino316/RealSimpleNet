@@ -178,10 +178,10 @@ namespace RealSimpleNet.Helpers
         /// </summary>
         /// <param name="url">The url</param>
         /// <returns></returns>
-        public string Delete(string url)
+        public string Delete(string url, object data = null)
         {
             url = EndPoint + url;
-            HttpResponse response = http.Delete(url, null, Http.ContentTypes.UrlEncoded);
+            HttpResponse response = http.Delete(url, data, Http.ContentTypes.UrlEncoded);
             StatusCode = response.StatusCode;
             Data = response.Data;
             Error = response.ErrorDescription;

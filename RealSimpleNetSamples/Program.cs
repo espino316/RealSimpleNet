@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using RealSimpleNet.Helpers;
 
 namespace RealSimpleNetSamples
-{
-    
+{    
     class Program
     {
         static void Main(string[] args)
         {
-            testDownload();
+            RestEntityTest();
         }
 
         static void onDownload(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
@@ -28,14 +26,14 @@ namespace RealSimpleNetSamples
             //Http http = new Http();
             //HttpResponse response = 
             //http.Get(
-            //"http://dev.eboletos.com.mx/admin/downloadbill/pdf/20171108114751STY090223LX3XEXX010101000"
+            //"https://i1.wp.com/desarrollo.espino.info/files/2017/12/28preguntasdesarrolladorNet.png"
             //);
-            //System.IO.File.WriteAllText("20171108114751STY090223LX3XEXX010101000.pdf", response.Data);
+            //System.IO.File.WriteAllText("28preguntasdesarrolladorNet.png", response.Data);
 
             Http http = new Http();
             http.DownloadAsync(
-                "http://dev.eboletos.com.mx/admin/downloadbill/pdf/20171108114751STY090223LX3XEXX010101000", 
-                "20171108114751STY090223LX3XEXX010101000.pdf",
+                "https://i1.wp.com/desarrollo.espino.info/files/2017/12/28preguntasdesarrolladorNet.png",
+                "28preguntasdesarrolladorNet.png",
                 onDownload,
                 onProgress
             );
@@ -49,7 +47,7 @@ namespace RealSimpleNetSamples
             http.AddHeader("eso", "es");
             http.AddParameter("foo", "bar");
             HttpResponse response
-                = http.Get("http://prosyss.com");
+                = http.Get("https://desarrollo.espino.info");
             Console.Write(response.Data);
             Console.Read();
         }
@@ -107,7 +105,7 @@ namespace RealSimpleNetSamples
             GetPedidos();
         }
 
-        class TicketInfo
+        class TicketInfo : RealSimpleNet.Libraries.RestEntity
         {
             public string ticketId;
             public string customerTaxId;
@@ -122,8 +120,8 @@ namespace RealSimpleNetSamples
         /// </summary>
         static void TestBillingApi()
         {
-            string endPoint = "http://localhost/eboletos/billingapi/bill";
-            endPoint = "http://dev.eboletos.com.mx/billingapi/bill";
+            string endPoint = "http://localhost/rsbill/billingapi/bill";
+            endPoint = "http://dev.espino.info/rsbill/billingapi/bill";
             string token = "8495cac4fa9156d509ec300c63b763966792f004";
             string key = "9e92f522f46124d19e36e3ad049cf78022faaca5";
 
@@ -132,11 +130,7 @@ namespace RealSimpleNetSamples
 
             http.AddParameter("ticketId", "123456789020014");
             http.AddParameter("customerTaxId", "XEXX010101000");
-            http.AddParameter("customerEmail", "lespino@prosyss.com");
-            http.AddParameter("airportId", "AICM");
-            http.AddParameter("companyId", "44");
-            http.AddParameter("companyBusinessId", "YELLOWCAB");
-            http.AddParameter("zoneId", "1");
+            http.AddParameter("customerEmail", "fakemail@espinoserver.com");
             http.AddParameter("serviceTypeId", "1");
             http.AddParameter("payFormId", "04");
             http.AddParameter("fare", "5.00");
@@ -171,6 +165,30 @@ namespace RealSimpleNetSamples
             Console.Read();
                
         } // end Post
+
+        static void RestEntityTest()
+        {
+            TicketInfo t = new TicketInfo();
+            t.customerEmail = "somemail";
+            t.customerTaxId = "sometaxid";
+            t.pdfUrl = "someurl";
+            t.ticketId = "1230404";
+            t.xmlUrl = "someurl";
+            t.SetEndpoint("http://localhost/rspos/v1/api/");
+            t.OnSuccess += T_OnSuccess;
+            t.OnError += T_OnError;
+            t.Post();
+        }
+
+        private static void T_OnError(Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+        private static void T_OnSuccess(string response)
+        {
+            Console.WriteLine(response);
+        }
 
         static void Post()
         {

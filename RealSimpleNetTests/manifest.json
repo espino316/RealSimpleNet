@@ -1,0 +1,15 @@
+﻿{
+    "appname": "Real Simple Releases",
+    "version": "1.0.0",
+    "main": "main.exe",
+    "files": [
+        {
+            "filename": "main.exe",
+            "checksum": "120EA8A25E5D487BF68B5F7096440019"
+        },
+        {
+            "filename": "lib/dll-1.dll",
+            "checksum":  "120EA8A25E5D487BF68B5F7096440019"
+        }
+    ]
+}

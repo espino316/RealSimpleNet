@@ -130,13 +130,29 @@ namespace RealSimpleNet.Helpers
             webClient.DownloadFileAsync(new Uri(url), filePath);
         } // end DownloadAsync
 
+        public void Download(string url, string filePath, string user, string password)
+        {
+            this.Download(url, filePath, null, user, password);
+        }
+
         public void Download(string url, string filePath, Dictionary<string, string> headers = null)
+        {
+            this.Download(url, filePath, headers);
+        } // end function Download
+
+        private void Download(string url, string filePath, Dictionary<string, string> headers = null, string user = null, string password = null)
         {
             WebClient webClient = new WebClient();
 
             if (headers == null)
             {
                 headers = this.headers;
+            }
+
+            if (user != null && password != null)
+            {
+                webClient.UseDefaultCredentials = true;
+                webClient.Credentials = new NetworkCredential(user, password);
             }
 
             foreach (string key in this.headers.Keys)

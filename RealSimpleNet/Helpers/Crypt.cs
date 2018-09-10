@@ -284,6 +284,30 @@ namespace RealSimpleNet.Helpers
             }
 
             return sb.ToString();
-        }        
+        }
+
+        /// <summary>
+        /// Returns a sha 256 checksum for a file
+        /// </summary>
+        /// <param name="file">The file to get the checksum for</param>
+        /// <returns></returns>
+        public static string Checksum(string file)
+        {
+            //  The sha256 to use
+            SHA256Managed sha256 = new SHA256Managed();
+
+            //  Open the file
+            using (FileStream fs = File.OpenRead(file))
+            {
+                //  Get the check sum to bytes
+                byte[] sum = sha256.ComputeHash(fs);
+                //  Convert the bytes to string
+                string result = BitConverter.ToString(sum);
+                //  Remove the hyphons
+                result = result.Replace("-", "");
+                //  Return the result
+                return result;
+            } // end using
+        } // end function check sum
     } // end class
 } // end namespace

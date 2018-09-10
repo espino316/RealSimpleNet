@@ -61,6 +61,7 @@
     <Compile Include="Helpers\RestClient.cs" />
     <Compile Include="Helpers\Strings.cs" />
     <Compile Include="Helpers\Validations.cs" />
+    <Compile Include="Libraries\RestEntity.cs" />
     <Compile Include="MVP\Model.cs" />
     <Compile Include="MVP\View.cs">
       <SubType>Form</SubType>
