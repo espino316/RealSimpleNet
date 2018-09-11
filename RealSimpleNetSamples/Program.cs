@@ -11,6 +11,30 @@ namespace RealSimpleNetSamples
             RestEntityTest();
         }
 
+        static void RestEntityTest()
+        {
+            TicketInfo t = new TicketInfo();
+            t.customerEmail = "somemail";
+            t.customerTaxId = "sometaxid";
+            t.pdfUrl = "someurl";
+            t.ticketId = "1230404";
+            t.xmlUrl = "someurl";
+            t.SetEndpoint("http://localhost/rspos/v1/api/");
+            t.OnRestfullSuccess += T_OnSuccess;
+            t.OnRestfullError += T_OnError;
+            t.RestfulPost();
+        }
+
+        private static void T_OnError(Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+        private static void T_OnSuccess(string response)
+        {
+            Console.WriteLine(response);
+        }
+
         static void onDownload(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
             Console.WriteLine("Completed");            
@@ -165,31 +189,7 @@ namespace RealSimpleNetSamples
             Console.Read();
                
         } // end Post
-
-        static void RestEntityTest()
-        {
-            TicketInfo t = new TicketInfo();
-            t.customerEmail = "somemail";
-            t.customerTaxId = "sometaxid";
-            t.pdfUrl = "someurl";
-            t.ticketId = "1230404";
-            t.xmlUrl = "someurl";
-            t.SetEndpoint("http://localhost/rspos/v1/api/");
-            t.OnSuccess += T_OnSuccess;
-            t.OnError += T_OnError;
-            t.Post();
-        }
-
-        private static void T_OnError(Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-
-        private static void T_OnSuccess(string response)
-        {
-            Console.WriteLine(response);
-        }
-
+        
         static void Post()
         {
             RestClient rest = new RestClient("http://localhost/rspos/api/v1/");

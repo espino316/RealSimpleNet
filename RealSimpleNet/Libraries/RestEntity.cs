@@ -11,8 +11,8 @@ namespace RealSimpleNet.Libraries
         public delegate void RestOperationSuccessHandler(string response);
         public delegate void RestOperationErrorHandler(Exception ex);
 
-        public event RestOperationSuccessHandler OnSuccess;
-        public event RestOperationErrorHandler OnError;
+        public event RestOperationSuccessHandler OnRestfullSuccess;
+        public event RestOperationErrorHandler OnRestfullError;
 
         private RestClient rest;
 
@@ -33,10 +33,10 @@ namespace RealSimpleNet.Libraries
         {
             try
             {
-                OnSuccess(rest.Post(this.GetType().Name, this));
+                OnRestfullSuccess(rest.Post(this.GetType().Name, this));
             } catch(Exception ex)
             {
-                OnError(ex);
+                OnRestfullError(ex);
             } // end function            
         } // end function ExecPost
 
@@ -47,11 +47,11 @@ namespace RealSimpleNet.Libraries
         {
             try
             {
-                OnSuccess(rest.Put(this.GetType().Name, this));
+                OnRestfullSuccess(rest.Put(this.GetType().Name, this));
             }
             catch (Exception ex)
             {
-                OnError(ex);
+                OnRestfullError(ex);
             } // end function     
         } // end function ExecPost
 
@@ -62,20 +62,41 @@ namespace RealSimpleNet.Libraries
         {
             try
             {
-                OnSuccess(rest.Delete(this.GetType().Name, this));
+                OnRestfullSuccess(rest.Delete(this.GetType().Name, this));
             }
             catch (Exception ex)
             {
-                OnError(ex);
+                OnRestfullError(ex);
             } // end function     
         } // end function ExecPost
 
         /// <summary>
+        /// Validates variable endpoint present
+        /// </summary>
+        private void Validate()
+        {
+            if (string.IsNullOrEmpty(Endpoint))
+            {
+                throw new Exception("Endpoint not present");
+            } // end if
+            
+            if (OnRestfullSuccess == null)
+            {
+                throw new Exception("Success handler not present");
+            }
+
+            if (OnRestfullError == null)
+            {
+                throw new Exception("Error handler not present");
+            }
+        } // end function Validate
+        
+        /// <summary>
         /// Start a new thread for a post call
         /// </summary>
-        public void Post()
+        public void RestfulPost()
         {
-            ExecPost();return;
+            Validate();
             Thread t = new Thread(ExecPost);
             t.Start();
         } // end function post
@@ -83,8 +104,9 @@ namespace RealSimpleNet.Libraries
         /// <summary>
         /// Makes a "POST" call to the api
         /// </summary>
-        public void Put()
+        public void RestfulPut()
         {
+            Validate();
             Thread t = new Thread(ExecPut);
             t.Start();
         } // end function post
@@ -92,8 +114,9 @@ namespace RealSimpleNet.Libraries
         /// <summary>
         /// Makes a "PUT" call to the api
         /// </summary>
-        public void DeleteEntity()
+        public void RestfulDelete()
         {
+            Validate();
             Thread t = new Thread(ExecDelete);
             t.Start();
         } // end function post
