@@ -44,6 +44,25 @@ namespace RealSimpleReleases.lib
         {
 
         } // end function add file
+        
+        public void UpdateManifestFiles()
+        {
+            string dir = Directory.GetCurrentDirectory() + "\\";
+            ReadManifest();
+            this.ParseDirectory(dir, dir, ref this.currentManifest);
+        }
+
+        private void SaveManifest(models.Manifest manifest)
+        {
+            manifest.ftpcredentials.Encrypt();
+            string json = serializer.Serialize(manifest);
+            Console.Write(json);
+
+            File.WriteAllText(
+                "manifest.json",
+                json
+            ); // end write all text
+        }
 
         public void Init(string appname, string main, string url, string user, string pwd)
         {
@@ -64,21 +83,24 @@ namespace RealSimpleReleases.lib
 
             this.ParseDirectory(dir, dir, ref manifest);
 
-            string json = serializer.Serialize(manifest);
-            //json = RealSimpleNet.Helpers.Crypt.Encrypt(json);
-
-            File.WriteAllText(
-                "manifest.json",
-                json
-            ); // end write all text
+            //  Saves the manifest to file
+            SaveManifest(manifest);
         } // end function init
 
         public void ReadManifest()
         {
+            if (!File.Exists("manifest.json"))
+            {
+                throw new Exception("Manifest not present. You're looking to configure a new release? Try with 'init' command.");
+            }
             string json = File.ReadAllText("manifest.json");
             //json = RealSimpleNet.Helpers.Crypt.Decrypt(json);
             this.currentManifest = serializer.Deserialize<models.Manifest>(json);
             this.currentManifest.ftpcredentials.Decrypt();
+            Console.WriteLine("ReadManifest:");
+            Console.WriteLine(currentManifest.ftpcredentials.Url);
+            Console.WriteLine(currentManifest.ftpcredentials.User);
+            Console.WriteLine(currentManifest.ftpcredentials.Pwd);
         }
 
         public void ParseDirectory(string rootDir, string dir, ref models.Manifest manifest)
@@ -88,6 +110,16 @@ namespace RealSimpleReleases.lib
 
             foreach (string file in files)
             {
+                Log("Parsing file: {0}", file);
+
+                if (
+                    file == AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName ||
+                    file == AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName.Replace(".exe", ".dll")
+                )
+                {
+                    continue;
+                } // end if same name
+
                 manifest.files.Add(
                     new models.MonitoredFile(
                         file.Replace(rootDir, ""),
@@ -108,18 +140,39 @@ namespace RealSimpleReleases.lib
         /// <param name="version"></param>
         public void PublishRelease(string version = null)
         {
+            if (version == null)
+            {
+                Log("No version specified, using 1.0.0.0");
+                version = "1.0.0.0";
+            }
+
+            if (File.Exists("latest"))
+            {
+                string latest = File.ReadAllText("latest");
+                if (latest == version)
+                {
+                    Log("Same version. Exiting");
+                    return;
+                } // end if latest = version
+            } // end if latest exists
+
             File.WriteAllText("latest", version);
             
-            this.ReadManifest();
-            //  Upgrade version
+            //  Look for changes
+            UpdateManifestFiles();
+            //  Set new version
             currentManifest.version = version;
-            
+
             string dir = Directory.GetCurrentDirectory();
             
             RealSimpleNet.Helpers.FTP ftp = new RealSimpleNet.Helpers.FTP();
             ftp.Server = currentManifest.ftpcredentials.Url;
             ftp.User = currentManifest.ftpcredentials.User;
             ftp.Pwd = currentManifest.ftpcredentials.Pwd;
+
+            Console.WriteLine(ftp.Server);
+            Console.WriteLine(ftp.User);
+            Console.WriteLine(ftp.Pwd);
 
             ftp.Upload("latest", "latest");
             ftp.CreateDirectory(version);
@@ -142,7 +195,10 @@ namespace RealSimpleReleases.lib
                 string destination = version + "/" + file.filename.Replace("\\", "/");
                 ftp.Upload(file.filename, destination);
             } // end for each
-            
+
+            //  Save new version
+            SaveManifest(currentManifest);
+
         } // end publish release
 
         /// <summary>
@@ -196,7 +252,7 @@ namespace RealSimpleReleases.lib
             string fileName)
         {
             //  Prepare folder structure
-
+            Console.WriteLine("Download Monitored file: " + fileName);
             //      The separator
             string[] sep = new string[] { "\\" };
 
@@ -246,7 +302,7 @@ namespace RealSimpleReleases.lib
         } // end void
 
         /// <summary>
-        /// Updates the application
+        /// Upgrades the application
         /// First read the manifest
         /// Then look for the latest version
         /// If the latest version is bigger than the current version, updates the application
@@ -254,7 +310,7 @@ namespace RealSimpleReleases.lib
         ///     Compare the files in both manifests
         ///     If there's an upgrade, backup current file and download the new one
         /// </summary>
-        public void Update()
+        public void Upgrade()
         {
             //  Read the manifest
             this.ReadManifest();
@@ -266,6 +322,7 @@ namespace RealSimpleReleases.lib
             RealSimpleNet.Helpers.Http http = new RealSimpleNet.Helpers.Http();
 
             //  Donwload the latest flag
+            Console.WriteLine(currentManifest.ftpcredentials.Url);
             http.Download(
                 currentManifest.ftpcredentials.Url + "/latest",
                 "latest.tmp",

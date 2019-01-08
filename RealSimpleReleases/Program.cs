@@ -14,47 +14,67 @@ namespace RealSimpleReleases
         const int SW_HIDE = 0;
         const int SW_SHOW = 5;
 
+        static void InitializeManifest(ref lib.ArgumentsParser parser)
+        {
+            string appname, main, url, user, pwd;
+            Console.WriteLine("Welcome to Real Simple Upgrades.");
+            Console.WriteLine("Please type the following information:");
+            Console.WriteLine("App name:");
+            appname = Console.ReadLine();
+            Console.WriteLine("Main executable file:");
+            main = Console.ReadLine();
+            Console.WriteLine("FTP Server:");
+            url = Console.ReadLine();
+            Console.WriteLine("FTP User name:");
+            user = Console.ReadLine();
+            Console.WriteLine("FTP Password:");
+            pwd = Console.ReadLine();
+
+            parser.Init(appname, main, url, user, pwd);
+
+            Console.WriteLine("Manifest created!");
+            return;
+        } // end function InitializeManifest
+
         static void Main(string[] args)
         {
+            
             IntPtr hwnd;
             hwnd = GetConsoleWindow();
             //ShowWindow(hwnd, SW_HIDE);
 
             lib.ArgumentsParser parser = new lib.ArgumentsParser();
-            
-            if (args.Length == 1 && args[0] == "init" )            
+
+            if (args.Length >= 1)
             {
-                string appname, main, url, user, pwd;
-                Console.WriteLine("Welcome to Real Simple Upgrades.");
-                Console.WriteLine("Please type the following information:");
-                Console.WriteLine("App name:");
-                appname = Console.ReadLine();
-                Console.WriteLine("Main executable file:");
-                main = Console.ReadLine();
-                Console.WriteLine("FTP Server:");
-                url = Console.ReadLine();
-                Console.WriteLine("FTP User name:");
-                user = Console.ReadLine();
-                Console.WriteLine("FTP Password:");
-                pwd = Console.ReadLine();
+                if (args[0] == "init")
+                {
+                    InitializeManifest(ref parser);
+                    return;
+                }
 
-                parser.Init(appname, main, url, user, pwd);
+                if (args[0] == "publish")
+                {
+                    string version = null;
+                    if (args.Length == 2)
+                    {
+                        version = args[1];
+                    }
 
-                Console.WriteLine("Manifest created!");
-                return;
-            }
+                    parser.PublishRelease(version);
+                    return;
+                }
+            } // end if args.len = 1
 
-            if (args.Length == 2 && args[0] == "publish")
+            parser.Upgrade();
+
+            try
             {
-                parser.PublishRelease(args[1]);
-                return;
+                
+            } catch(Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
             }
-
-            parser.Update();
-            //parser.Init("myapp", "RealSimpleReleases.exe");
-            //parser.Parse(new string[]{"add-file", "some"});
-
-            //Console.Read();
         }
     }
 }

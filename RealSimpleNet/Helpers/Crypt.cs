@@ -53,7 +53,7 @@ namespace RealSimpleNet.Helpers
         }
 
 
-        public static String Decrypt(String strDesEnc)
+        public static String Decrypt(String value)
         {
             SetKeys();
 
@@ -62,7 +62,7 @@ namespace RealSimpleNet.Helpers
             byte[] encrypted;
             byte[] ret;
 
-            encrypted = Convert.FromBase64String(strDesEnc);
+            encrypted = Convert.FromBase64String(value);
 
             MemoryStream msDecrypt = new MemoryStream(encrypted);
             CryptoStream csDecrypt = new CryptoStream(msDecrypt,
@@ -74,9 +74,10 @@ namespace RealSimpleNet.Helpers
 
             ret = StripZeros(fromEncrypt);
 
-            strDesEnc = textConverter.GetString(ret);
+            value = textConverter.GetString(ret);
+            Console.WriteLine(value);
 
-            return strDesEnc;
+            return value;
         }
 
         private static byte[] StripZeros(byte[] bites)
