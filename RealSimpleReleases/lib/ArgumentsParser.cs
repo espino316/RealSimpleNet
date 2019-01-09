@@ -56,7 +56,6 @@ namespace RealSimpleReleases.lib
         {
             manifest.ftpcredentials.Encrypt();
             string json = serializer.Serialize(manifest);
-            Console.Write(json);
 
             File.WriteAllText(
                 "manifest.json",
@@ -79,7 +78,6 @@ namespace RealSimpleReleases.lib
                     user,
                     pwd
                 );
-            manifest.ftpcredentials.Encrypt();
 
             this.ParseDirectory(dir, dir, ref manifest);
 
@@ -95,12 +93,8 @@ namespace RealSimpleReleases.lib
             }
             string json = File.ReadAllText("manifest.json");
             //json = RealSimpleNet.Helpers.Crypt.Decrypt(json);
-            this.currentManifest = serializer.Deserialize<models.Manifest>(json);
-            this.currentManifest.ftpcredentials.Decrypt();
-            Console.WriteLine("ReadManifest:");
-            Console.WriteLine(currentManifest.ftpcredentials.Url);
-            Console.WriteLine(currentManifest.ftpcredentials.User);
-            Console.WriteLine(currentManifest.ftpcredentials.Pwd);
+            currentManifest = serializer.Deserialize<models.Manifest>(json);
+            currentManifest.ftpcredentials.Decrypt();
         }
 
         public void ParseDirectory(string rootDir, string dir, ref models.Manifest manifest)
@@ -169,11 +163,7 @@ namespace RealSimpleReleases.lib
             ftp.Server = currentManifest.ftpcredentials.Url;
             ftp.User = currentManifest.ftpcredentials.User;
             ftp.Pwd = currentManifest.ftpcredentials.Pwd;
-
-            Console.WriteLine(ftp.Server);
-            Console.WriteLine(ftp.User);
-            Console.WriteLine(ftp.Pwd);
-
+            
             ftp.Upload("latest", "latest");
             ftp.CreateDirectory(version);
             
@@ -322,7 +312,6 @@ namespace RealSimpleReleases.lib
             RealSimpleNet.Helpers.Http http = new RealSimpleNet.Helpers.Http();
 
             //  Donwload the latest flag
-            Console.WriteLine(currentManifest.ftpcredentials.Url);
             http.Download(
                 currentManifest.ftpcredentials.Url + "/latest",
                 "latest.tmp",

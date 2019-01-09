@@ -75,6 +75,27 @@ namespace RealSimpleReleases
             {
                 Console.WriteLine("Error: " + ex.Message);
             }
-        }
+        } // end function main
+
+        static void Tests()
+        {
+            lib.models.Credentials creds = new lib.models.Credentials();
+            creds.Pwd = "some";
+            creds.Url = "url";
+            creds.User = "res";
+            creds.Encrypt();
+
+            if (creds.Pwd == "some" || creds.Url == "url" || creds.User == "res")
+            {
+                throw new Exception("Credentias.Encrypt fail");
+            }
+
+            creds.Decrypt();
+
+            if (creds.Pwd != "some" || creds.Url != "url" || creds.User != "res")
+            {
+                throw new Exception("Credentias.Decrypt fail");
+            }
+        } // end function Test
     }
 }
