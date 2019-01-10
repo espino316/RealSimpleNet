@@ -55,6 +55,7 @@
     <Compile Include="Helpers\FTP.cs" />
     <Compile Include="Helpers\Http.cs" />
     <Compile Include="Helpers\HttpResponse.cs" />
+    <Compile Include="Helpers\Json.cs" />
     <Compile Include="Helpers\Mail.cs" />
     <Compile Include="Helpers\Print.cs" />
     <Compile Include="Helpers\RawPrint.cs" />

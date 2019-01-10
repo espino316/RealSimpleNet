@@ -8,7 +8,15 @@ namespace RealSimpleNetSamples
     {
         static void Main(string[] args)
         {
-            RestEntityTest();
+            //RestEntityTest();
+            Console.WriteLine(Crypt.Checksum("somefile.txt"));
+
+            Console.WriteLine(Crypt.Checksum("somefile.txt"));
+
+            Console.WriteLine(Crypt.Checksum("somefile.txt"));
+
+            Console.Read();
+
         }
 
         static void RestEntityTest()

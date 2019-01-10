@@ -56,6 +56,7 @@ namespace RealSimpleReleases.lib
         {
             manifest.ftpcredentials.Encrypt();
             string json = serializer.Serialize(manifest);
+            json = RealSimpleNet.Helpers.Json.PrettyPrint(json);
 
             File.WriteAllText(
                 "manifest.json",
@@ -114,7 +115,7 @@ namespace RealSimpleReleases.lib
                     continue;
                 } // end if same name
 
-                manifest.files.Add(
+                manifest.AddFile(
                     new models.MonitoredFile(
                         file.Replace(rootDir, ""),
                         RealSimpleNet.Helpers.Crypt.Checksum(file)
@@ -154,6 +155,7 @@ namespace RealSimpleReleases.lib
             
             //  Look for changes
             UpdateManifestFiles();
+
             //  Set new version
             currentManifest.version = version;
 
@@ -225,6 +227,18 @@ namespace RealSimpleReleases.lib
             } // end if parts > 1
 
             //  Here we finally move the file
+            if (!File.Exists(fileName))
+            {
+                throw new Exception("Archivo no existe y no se puede mover " + fileName);
+            } // end if file not exists
+
+            //  Check do not exists already
+            if (File.Exists(string.Format("{0}\\{1}", version, fileName)))
+            {
+                File.Delete(string.Format("{0}\\{1}", version, fileName));
+            } // end if file exists
+
+            //  Actually move the file
             File.Move(fileName, string.Format("{0}\\{1}", version, fileName));
 
         } // end function backup monitored file
@@ -377,6 +391,11 @@ namespace RealSimpleReleases.lib
                             this.BackupMonitoredFile(currentVersion, localFile.filename);
                             Log("{0} backed up.", file.filename);
 
+                            if (File.Exists(file.filename))
+                            {
+                                File.Delete(file.filename);
+                            } // end if file exists
+
                             //      Donwload new file
                             this.DownloadMonitoredFile(
                                 ref http,
@@ -384,6 +403,7 @@ namespace RealSimpleReleases.lib
                                 currentManifest,
                                 file.filename
                             ); // end DownloadMonitoredFile
+
                             Log("{0} downloaded.", file.filename);
                         } // end if diff checsum
                     } // end if same file
