@@ -75,7 +75,6 @@ namespace RealSimpleNet.Helpers
             ret = StripZeros(fromEncrypt);
 
             value = textConverter.GetString(ret);
-            Console.WriteLine(value);
 
             return value;
         }

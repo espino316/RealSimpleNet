@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Web.Script.Serialization;
+using System.Linq;
 
 namespace RealSimpleReleases.lib
 {
@@ -39,12 +40,7 @@ namespace RealSimpleReleases.lib
             Match m = regex.Match(value);
             return (m.Value == value);
         } // end function Match
-
-        private void AddFile(string source)
-        {
-
-        } // end function add file
-        
+                
         public void UpdateManifestFiles()
         {
             string dir = Directory.GetCurrentDirectory() + "\\";
@@ -152,7 +148,7 @@ namespace RealSimpleReleases.lib
             } // end if latest exists
 
             File.WriteAllText("latest", version);
-            
+
             //  Look for changes
             UpdateManifestFiles();
 
@@ -165,7 +161,10 @@ namespace RealSimpleReleases.lib
             ftp.Server = currentManifest.ftpcredentials.Url;
             ftp.User = currentManifest.ftpcredentials.User;
             ftp.Pwd = currentManifest.ftpcredentials.Pwd;
-            
+
+            //  Save new version
+            SaveManifest(currentManifest);
+
             ftp.Upload("latest", "latest");
             ftp.CreateDirectory(version);
             
@@ -187,10 +186,6 @@ namespace RealSimpleReleases.lib
                 string destination = version + "/" + file.filename.Replace("\\", "/");
                 ftp.Upload(file.filename, destination);
             } // end for each
-
-            //  Save new version
-            SaveManifest(currentManifest);
-
         } // end publish release
 
         /// <summary>
@@ -285,7 +280,7 @@ namespace RealSimpleReleases.lib
 
             //  Setup source and destination
             string source = string.Format("{0}/{1}/{2}", manifest.ftpcredentials.Url, version, fileName);
-            string destination = fileName;
+            string destination = fileName + ".tmp";
 
             //  Actually download the file
             http.Download(
@@ -304,6 +299,25 @@ namespace RealSimpleReleases.lib
         {
             Console.WriteLine(string.Format(msg, args));
         } // end void
+
+        /// <summary>
+        /// Validates all files in manifest exists and ok (checksum verified)
+        /// </summary>
+        /// <param name="manifest">The manifest to validate</param>
+        private void ValidateManifest(models.Manifest manifest)
+        {
+            manifest.files.ForEach(f => {
+                if (!File.Exists(f.filename))
+                {
+                    throw new FileNotFoundException(string.Format("{0} does not exists", f.filename));
+                } // end if file do not exists
+
+                if (f.checksum != RealSimpleNet.Helpers.Crypt.Checksum(f.filename))
+                {
+                    throw new Exception(string.Format("Checksum of file {0} does not match", f.filename));
+                } // end if check sum do not match
+            }); // end for each file in the manifest
+        } // end function ValidateManifest
 
         /// <summary>
         /// Upgrades the application
@@ -366,51 +380,15 @@ namespace RealSimpleReleases.lib
 
             Log("New manifest loaded in memory. Start comparing files.");
 
+            List<models.MonitoredFile> updatedFiles = new List<models.MonitoredFile>();
+
             //  Compare files from new manifest with the oldone
             foreach (models.MonitoredFile file in tmpManifest.files)
             {
-                //  Indicates if the file exist in the old manifest
-                bool exists = false;
+                models.MonitoredFile localFile = null;
+                localFile = currentManifest.files.FirstOrDefault(f => f.filename == file.filename);
 
-                //  Loop through the current files
-                foreach (models.MonitoredFile localFile in currentManifest.files)
-                {                   
-                    //  If it's the same file 
-                    if (file.filename.Equals(localFile.filename))
-                    {
-                        //  Exists in both manifests                        
-                        exists = true;
-
-                        //  Compare the checksum
-                        if (!file.checksum.Equals(localFile.checksum))
-                        {
-                            Log("New version file {0}. Updating...", file.filename);
-
-                            //  Here exists and has different chechsum
-                            //      Backup the file, move it
-                            this.BackupMonitoredFile(currentVersion, localFile.filename);
-                            Log("{0} backed up.", file.filename);
-
-                            if (File.Exists(file.filename))
-                            {
-                                File.Delete(file.filename);
-                            } // end if file exists
-
-                            //      Donwload new file
-                            this.DownloadMonitoredFile(
-                                ref http,
-                                version,
-                                currentManifest,
-                                file.filename
-                            ); // end DownloadMonitoredFile
-
-                            Log("{0} downloaded.", file.filename);
-                        } // end if diff checsum
-                    } // end if same file
-                } // end foreach local file
-
-                //  If the file is new, downloaded
-                if (!exists)
+                if (localFile == null)
                 {
                     Log("New file {0}. Downloading...", file.filename);
                     //  Donwload new file
@@ -421,16 +399,59 @@ namespace RealSimpleReleases.lib
                         file.filename
                     ); // end DownloadMonitoredFile
                     Log("{0} downloaded.", file.filename);
-                } // end if not exists
+                } else
+                {
+                    //  Compare the checksum
+                    if (!file.checksum.Equals(localFile.checksum))
+                    {
+                        Log("New version file {0}. Updating...", file.filename);
+                        //      Donwload new file
+                        this.DownloadMonitoredFile(
+                            ref http,
+                            version,
+                            currentManifest,
+                            file.filename
+                        ); // end DownloadMonitoredFile
+
+                        //  Add to the list
+                        updatedFiles.Add(file);
+
+                        Log("{0} downloaded.", file.filename + ".tmp");
+                    } // end if diff checsum
+                } // end if then else local file is null
             } // end foreach file
 
-            // if the file exists in local, but not in remote, do nothing
+            //  Loop the updated files
+            //  Backup the files
+            //  Rename the files
+            updatedFiles.ForEach(f => {
 
-            //  Remove temp files
-            File.Delete("latest");
-            File.Move("latest.tmp", "latest");
-            File.Delete("manifest.json");
-            File.Move("manifest.json.tmp", "manifest.json");
+                //  Here exists and has different chechsum
+                //      Backup the file, move it
+                this.BackupMonitoredFile(currentVersion, f.filename);
+
+                Log("{0} backed up.", f.filename);
+
+                //  Delete if exists
+                if (File.Exists(f.filename))
+                {
+                    File.Delete(f.filename);
+                } // end if file exists
+
+                //  Rename the downloaded file is exists
+                if (!File.Exists(f.filename + ".tmp"))
+                {
+                    throw new Exception(string.Format("{0} file was not downloaded correctly", f.filename));
+                } // end if not exists downloaded file
+
+                //  Rename the files
+                File.Move(f.filename + ".tmp", f.filename);
+            }); // end for each file
+
+            // if the file exists in local, but not in remote, do nothing
+            
+            //  Validates the latest manifest
+            ValidateManifest(tmpManifest);
 
         } // void update
     } // end ArgumentsParser class
