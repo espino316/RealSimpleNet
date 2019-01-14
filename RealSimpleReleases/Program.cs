@@ -63,7 +63,14 @@ namespace RealSimpleReleases
 
                     parser.PublishRelease(version);
                     return;
-                }
+                } // end if publish
+
+                if (args[0] == "checksum" && args.Length == 2)
+                {
+                    string file = args[1];
+                    Console.WriteLine(RealSimpleNet.Helpers.Crypt.Checksum(file));
+                    return;
+                } // end if checksum
             } // end if args.len = 1
 
             parser.Upgrade();

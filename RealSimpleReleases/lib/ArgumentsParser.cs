@@ -104,10 +104,11 @@ namespace RealSimpleReleases.lib
                 Log("Parsing file: {0}", file);
 
                 if (
-                    file == AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName ||
-                    file == AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName.Replace(".exe", ".dll")
+                    file.ToLower() == (AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName).ToLower() ||
+                    file.ToLower() == (AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName.Replace(".exe", ".dll")).ToLower()
                 )
                 {
+                    Console.WriteLine("Ignoring " + AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName);
                     continue;
                 } // end if same name
 
@@ -312,7 +313,7 @@ namespace RealSimpleReleases.lib
                     throw new FileNotFoundException(string.Format("{0} does not exists", f.filename));
                 } // end if file do not exists
 
-                if (f.checksum != RealSimpleNet.Helpers.Crypt.Checksum(f.filename))
+                if (f.filename != "manifest.json" && f.checksum != RealSimpleNet.Helpers.Crypt.Checksum(f.filename))
                 {
                     throw new Exception(string.Format("Checksum of file {0} does not match", f.filename));
                 } // end if check sum do not match
@@ -398,6 +399,9 @@ namespace RealSimpleReleases.lib
                         currentManifest,
                         file.filename
                     ); // end DownloadMonitoredFile
+                    //  Add to the list
+                    updatedFiles.Add(file);
+                    Console.WriteLine("add updated file " + file.filename);
                     Log("{0} downloaded.", file.filename);
                 } else
                 {
@@ -415,6 +419,7 @@ namespace RealSimpleReleases.lib
 
                         //  Add to the list
                         updatedFiles.Add(file);
+                        Console.WriteLine("add updated file " + file.filename);
 
                         Log("{0} downloaded.", file.filename + ".tmp");
                     } // end if diff checsum
@@ -425,6 +430,8 @@ namespace RealSimpleReleases.lib
             //  Backup the files
             //  Rename the files
             updatedFiles.ForEach(f => {
+
+                Console.WriteLine("updateFile: " + f.filename);
 
                 //  Here exists and has different chechsum
                 //      Backup the file, move it
@@ -445,6 +452,7 @@ namespace RealSimpleReleases.lib
                 } // end if not exists downloaded file
 
                 //  Rename the files
+                Console.WriteLine("Moving file " + f.filename + ".tmp");
                 File.Move(f.filename + ".tmp", f.filename);
             }); // end for each file
 
