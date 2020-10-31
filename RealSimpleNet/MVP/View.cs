@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using RealSimpleNet.Helpers;
@@ -7,6 +8,31 @@ namespace RealSimpleNet.MVP
 {
     public class View : Form
     {
+        protected Model model;
+        
+        public View()
+        {
+        }
+
+        public View(Model _model)
+        {
+            model = _model;
+            model.PropertyChanged += Model_PropertyChanged;
+        }
+
+        protected virtual void OnModelPropertyChanged(string propertyName, Type propertyType, object propertyValue)
+        {
+            // TODO
+        } // end function OnModelPropertyChanged
+        
+        public void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            string propertyName = e.PropertyName;
+            Type propertyType = model.GetType().GetProperty(e.PropertyName).PropertyType;
+            object propertyValue = model.GetType().GetProperty(e.PropertyName).GetValue(model, null);
+            OnModelPropertyChanged(propertyName, propertyType, propertyValue);
+        } // end function Model_PropertyChanged
+
         public DialogResult ShowInfo(string text, string title = "Info")
         {
             return MessageBox.Show(text, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -123,6 +149,7 @@ namespace RealSimpleNet.MVP
             string dataMember
         )
         {
+            
             control.DataBindings.Add(
                 new Binding(
                     controlProperty,
@@ -131,7 +158,23 @@ namespace RealSimpleNet.MVP
                     true,
                     DataSourceUpdateMode.OnPropertyChanged
                 ) // end new binding
-            ); // end control databindings add            
+            ); // end control databindings add
+            
+            /*
+            model.PropertyChanged += delegate(object sender, PropertyChangedEventArgs e)
+            {
+                string propertyName = e.PropertyName;
+
+                if (propertyName == dataMember)
+                {
+                    Type propertyType = model.GetType().GetProperty(e.PropertyName).PropertyType;
+                    object propertyValue = model.GetType().GetProperty(e.PropertyName).GetValue(model, null);
+
+                    control.GetType().GetProperty(controlProperty).SetValue(control, propertyValue, null);
+                } // end if propertyname is the datamember
+            }; // end function Model_PropertyChanged
+            */
+            
         } // end void SetBinding
 
         public void ValidInputOnlyNumbers_Keypress(object sender, KeyPressEventArgs e)

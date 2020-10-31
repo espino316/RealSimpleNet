@@ -14,7 +14,10 @@ namespace RealSimpleNet.MVP
 
         protected void NotifyPropertyChanged(string name)
         {
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(name));
+            if (PropertyChanged != null)
+            {
+                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(name));
+            } // end if PropertyChanged != null
         } // end void NotifyPropertyChanged
     } // end class Model
 } // end namespace MVP
