@@ -90,10 +90,11 @@ namespace RealSimpleNet.Helpers
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create(Server + "/" + destination);
             request.Method = WebRequestMethods.Ftp.UploadFile;
             request.Credentials = new NetworkCredential(this.User, this.Pwd);
+            request.UsePassive = true;
+            request.UseBinary = true;
+            request.KeepAlive = false;
 
-            StreamReader sourceStream = new StreamReader(source);
-            byte[] fileContents = Encoding.UTF8.GetBytes(sourceStream.ReadToEnd());
-            sourceStream.Close();
+            byte[] fileContents = File.ReadAllBytes(source);
 
             request.ContentLength = fileContents.Length;
             Stream requestStream = request.GetRequestStream();        

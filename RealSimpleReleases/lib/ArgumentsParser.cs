@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Web.Script.Serialization;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 
 namespace RealSimpleReleases.lib
 {
@@ -184,7 +185,10 @@ namespace RealSimpleReleases.lib
                     }
                 } // end if parts > 1
 
+                //  Get the destination file
                 string destination = version + "/" + file.filename.Replace("\\", "/");
+
+                //  Upload via ftp
                 ftp.Upload(file.filename, destination);
             } // end for each
         } // end publish release
@@ -225,7 +229,9 @@ namespace RealSimpleReleases.lib
             //  Here we finally move the file
             if (!File.Exists(fileName))
             {
-                throw new Exception("Archivo no existe y no se puede mover " + fileName);
+                //throw new Exception("File do not exists and cannot be moved " + fileName);
+                Log("File do not exists. Don't need to backup");
+                return;
             } // end if file not exists
 
             //  Check do not exists already
@@ -354,12 +360,31 @@ namespace RealSimpleReleases.lib
             Log("Last version is {0}", version);
 
             //  Here we compare versions
-            if (version.CompareTo(currentManifest.version) <= 0)
+            if (version.CompareTo(currentManifest.version) < 0)
             {
                 //  If same version, exit
                 Log("Old version. Exiting");
                 return;
             }
+
+            if (version.CompareTo(currentManifest.version) == 0)
+            {
+                //  If same version, exit
+                Log("Same version. Check if local files exists");
+
+                //  Check files in manifest exists
+                bool existFiles = true;
+                currentManifest.files.ForEach(f => existFiles = existFiles && File.Exists(f.filename));
+
+                if (existFiles)
+                {
+                    Log("Local files exists. Exiting");
+                    return;
+                } else
+                {
+                    Log("Local files do not exists. Upgrading.");
+                } // end if then else existFiles
+            } // end if same version
 
             Log("New version, updating");
 
@@ -386,10 +411,11 @@ namespace RealSimpleReleases.lib
             //  Compare files from new manifest with the oldone
             foreach (models.MonitoredFile file in tmpManifest.files)
             {
+                Log("Comparing " + file.filename + "...");
                 models.MonitoredFile localFile = null;
                 localFile = currentManifest.files.FirstOrDefault(f => f.filename == file.filename);
 
-                if (localFile == null)
+                if (localFile == null || !File.Exists(file.filename))
                 {
                     Log("New file {0}. Downloading...", file.filename);
                     //  Donwload new file
@@ -457,8 +483,9 @@ namespace RealSimpleReleases.lib
             }); // end for each file
 
             // if the file exists in local, but not in remote, do nothing
-            
+
             //  Validates the latest manifest
+            Log("Validating the manifest");
             ValidateManifest(tmpManifest);
 
         } // void update

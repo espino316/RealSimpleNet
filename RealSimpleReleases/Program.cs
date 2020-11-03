@@ -38,49 +38,53 @@ namespace RealSimpleReleases
 
         static void Main(string[] args)
         {
-            
-            IntPtr hwnd;
-            hwnd = GetConsoleWindow();
-            //ShowWindow(hwnd, SW_HIDE);
-
-            lib.ArgumentsParser parser = new lib.ArgumentsParser();
-
-            if (args.Length >= 1)
+           try
             {
-                if (args[0] == "init")
-                {
-                    InitializeManifest(ref parser);
-                    return;
-                }
+                IntPtr hwnd;
+                hwnd = GetConsoleWindow();
+                //ShowWindow(hwnd, SW_HIDE);
 
-                if (args[0] == "publish")
+                lib.ArgumentsParser parser = new lib.ArgumentsParser();
+
+                if (args.Length >= 1)
                 {
-                    string version = null;
-                    if (args.Length == 2)
+                    if (args[0] == "init")
                     {
-                        version = args[1];
+                        InitializeManifest(ref parser);
+                        return;
                     }
 
-                    parser.PublishRelease(version);
-                    return;
-                } // end if publish
+                    if (args[0] == "publish")
+                    {
+                        string version = null;
+                        if (args.Length == 2)
+                        {
+                            version = args[1];
+                        }
 
-                if (args[0] == "checksum" && args.Length == 2)
-                {
-                    string file = args[1];
-                    Console.WriteLine(RealSimpleNet.Helpers.Crypt.Checksum(file));
-                    return;
-                } // end if checksum
-            } // end if args.len = 1
+                        parser.PublishRelease(version);
+                        return;
+                    } // end if publish
 
-            parser.Upgrade();
+                    if (args[0] == "checksum" && args.Length == 2)
+                    {
+                        string file = args[1];
+                        Console.WriteLine(RealSimpleNet.Helpers.Crypt.Checksum(file));
+                        return;
+                    } // end if checksum
+                } // end if args.len = 1
 
-            try
-            {
-                
+                parser.Upgrade();
             } catch(Exception ex)
             {
                 Console.WriteLine("Error: " + ex.Message);
+                Console.WriteLine("Stack trace: " + ex.StackTrace);
+
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine("Error Inner: " + ex.InnerException.Message);
+                    Console.WriteLine("Stack trace Inner: " + ex.InnerException.StackTrace);
+                }
             }
         } // end function main
 
