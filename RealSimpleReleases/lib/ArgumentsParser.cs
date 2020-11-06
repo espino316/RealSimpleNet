@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Web.Script.Serialization;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
+using System.Diagnostics;
 
 namespace RealSimpleReleases.lib
 {
@@ -118,7 +119,13 @@ namespace RealSimpleReleases.lib
                         file.Replace(rootDir, ""),
                         RealSimpleNet.Helpers.Crypt.Checksum(file)
                     ) // end new model.MonitoredFile
-                ); // end manifest add                
+                ); // end manifest add
+
+                string main = manifest.main;
+                if (manifest.files.Find(f => f.filename == main) == null)
+                {
+                    throw new Exception(string.Format("Main file '{0}' not present in manifest", main));
+                } // end if main is not in the manifest
             } // end foreach
 
             foreach (string directory in directories)
@@ -143,9 +150,9 @@ namespace RealSimpleReleases.lib
             {
                 string latest = File.ReadAllText("latest");
                 if (latest == version)
-                {
-                    Log("Same version. Exiting");
-                    return;
+                {                    
+                    version = UpgradeVersionNumber(version);
+                    Log(string.Format("Same version. Upgrading version to {0}", version));
                 } // end if latest = version
             } // end if latest exists
 
@@ -157,8 +164,6 @@ namespace RealSimpleReleases.lib
             //  Set new version
             currentManifest.version = version;
 
-            string dir = Directory.GetCurrentDirectory();
-            
             RealSimpleNet.Helpers.FTP ftp = new RealSimpleNet.Helpers.FTP();
             ftp.Server = currentManifest.ftpcredentials.Url;
             ftp.User = currentManifest.ftpcredentials.User;
@@ -379,6 +384,7 @@ namespace RealSimpleReleases.lib
                 if (existFiles)
                 {
                     Log("Local files exists. Exiting");
+                    StartMain(currentManifest);
                     return;
                 } else
                 {
@@ -487,7 +493,51 @@ namespace RealSimpleReleases.lib
             //  Validates the latest manifest
             Log("Validating the manifest");
             ValidateManifest(tmpManifest);
-
+            StartMain(currentManifest);
         } // void update
+
+        /// <summary>
+        /// Validates main exists, and if so, start the main process
+        /// </summary>
+        /// <param name="currentManifest"></param>
+        private void StartMain(models.Manifest currentManifest)
+        {
+            //  Validate main exists
+            if (!File.Exists(currentManifest.main))
+            {
+                throw new Exception(string.Format("Main file '{0}' do not exists", currentManifest.main));
+            }
+            else
+            {
+                Log("Starting main {0}", currentManifest.main);
+                Process.Start(currentManifest.main);                
+            } // end if file exists
+        } // end function StartMain
+
+        private string UpgradeVersionNumber(string versionNumber)
+        {
+            string[] numbers = versionNumber.Split('.');
+            int lastVersionNumber;
+            string result;
+
+            if (int.TryParse(numbers[numbers.Length - 1], out lastVersionNumber))
+            {
+                lastVersionNumber++;
+                numbers[numbers.Length - 1] = lastVersionNumber.ToString();
+                result = string.Join(".", numbers);
+            }
+            else
+            {
+                throw new Exception(string.Format("Version elements are not integers '{0}'", versionNumber));
+            }// end if versionNumber is int
+
+            if (string.IsNullOrEmpty(result))
+            {
+                throw new Exception("Error forming the version number");
+            }
+
+            //  Return result
+            return result;
+        } // end function UpgradeVersionNumber
     } // end ArgumentsParser class
 } // end namespace lib

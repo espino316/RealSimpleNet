@@ -4,10 +4,6 @@ namespace RealSimpleReleases.lib.models
 {
     class Credentials
     {
-        private string url;
-        private string user;
-        private string pwd;
-
         public string Url { get; set; }
 
         public string User { get; set; }

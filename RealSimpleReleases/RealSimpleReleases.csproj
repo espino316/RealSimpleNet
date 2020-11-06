@@ -65,17 +65,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RealSimpleNet\RealSimpleNet.csproj">
-      <Project>{c01c9310-301a-4c74-8d4f-5ed76919fd67}</Project>
-      <Name>RealSimpleNet</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RealSimpleNet\RealSimpleNet.csproj">
+      <Project>{c01c9310-301a-4c74-8d4f-5ed76919fd67}</Project>
+      <Name>RealSimpleNet</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

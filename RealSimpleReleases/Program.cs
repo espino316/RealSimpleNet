@@ -78,12 +78,10 @@ namespace RealSimpleReleases
             } catch(Exception ex)
             {
                 Console.WriteLine("Error: " + ex.Message);
-                Console.WriteLine("Stack trace: " + ex.StackTrace);
 
                 if (ex.InnerException != null)
                 {
-                    Console.WriteLine("Error Inner: " + ex.InnerException.Message);
-                    Console.WriteLine("Stack trace Inner: " + ex.InnerException.StackTrace);
+                    Console.WriteLine("Error Inner: " + ex.InnerException.Message);                    
                 }
             }
         } // end function main
