@@ -47,6 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\BindPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Helpers\Crypt.cs" />
     <Compile Include="Helpers\Databases\OleDb.cs" />
     <Compile Include="Helpers\Databases\SqlServer.cs" />

@@ -194,8 +194,15 @@ namespace RealSimpleNet.Helpers
                     requestData = this.jsonData;
                 }
 
-                if (data != null && contentType == ContentTypes.Json)
-                {                    
+                if (data != null && contentType == ContentTypes.Json && IsJson(data.ToString()))
+                {
+                    requestData = data.ToString();
+                }
+
+                //  here we got and object and we serialize it to json
+                if (data != null && contentType == ContentTypes.Json && !IsJson(data.ToString()))
+                {
+                    
                     requestData = serializer.Serialize(data);
                     string pattern = "Date\\(\\d*\\)";
                     pattern = "\\\\\\/Date\\(\\d*\\)\\\\\\/";
@@ -304,5 +311,33 @@ namespace RealSimpleNet.Helpers
                 throw ex;
             }
         } // end post
+
+        private bool IsJson(string toValidate)
+        {
+            
+            if (toValidate == null)
+            {
+                return true;
+            }
+
+            toValidate = toValidate.Trim();
+
+            if (toValidate == "")
+            {
+                return true;
+            }
+
+            string first, last;
+
+            first = toValidate.Substring(0, 1);
+            last = toValidate.Substring(toValidate.Length - 1, 1);
+
+            if ((first == "{" && last == "}") || (first == "[" && last == "]"))
+            {
+                return true;
+            } // end if object or array
+
+            return false;
+        } // end bool is valid json string
     } // end class
 } // end namespace

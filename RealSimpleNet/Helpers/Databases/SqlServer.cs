@@ -540,7 +540,7 @@ namespace RealSimpleNet.Helpers.Databases
 
                 DataSet ds = new DataSet();
                 SqlDataAdapter da = new SqlDataAdapter(command);
-                da.Fill(ds, "SICASDATA");
+                da.Fill(ds, "REALSIMPLEDATA");
 
                 return ds.Tables[0];
             }
@@ -593,7 +593,7 @@ namespace RealSimpleNet.Helpers.Databases
 
                 DataSet ds = new DataSet();
                 SqlDataAdapter da = new SqlDataAdapter(command);
-                da.Fill(ds, "SICASDATA");
+                da.Fill(ds, "REALSIMPLEDATA");
 
                 return ds.Tables[0];
             }
@@ -610,6 +610,27 @@ namespace RealSimpleNet.Helpers.Databases
                 command.Dispose();
             }
         } // public static DataTable QueryCommand
+
+        public static List<T> QueryList<T>(string query, Hashtable dbParams)
+        {
+            var result = new List<T>();
+            DataTable dt = QueryCommand(query, dbParams);
+            object instance;
+            
+            foreach (DataRow dr in dt.Rows)
+            {
+                instance = (T)Activator.CreateInstance(typeof(T));
+                foreach (DataColumn dc in dt.Columns)
+                {
+                    object val = dr[dc.ColumnName];
+                    if (Convert.IsDBNull(val)) val = null;
+                    PropertyInfo pi = instance.GetType().GetProperty(dc.ColumnName);
+                    pi.SetValue(instance, val, null);
+                }
+                result.Add((T)instance);
+            }
+            return result;
+        }
 
         public static void ExecuteQuery(string execQuery)
         {
@@ -873,7 +894,7 @@ namespace RealSimpleNet.Helpers.Databases
 
                 DataSet ds = new DataSet();
                 SqlDataAdapter da = new SqlDataAdapter(command);
-                da.Fill(ds, "SICASDATA");
+                da.Fill(ds, "REALSIMPLEDATA");
 
                 return ds.Tables[0];
             }
@@ -925,7 +946,7 @@ namespace RealSimpleNet.Helpers.Databases
 
                 DataSet ds = new DataSet();
                 SqlDataAdapter da = new SqlDataAdapter(command);
-                da.Fill(ds, "SICASDATA");
+                da.Fill(ds, "REALSIMPLEDATA");
 
                 return ds.Tables[0];
             }
